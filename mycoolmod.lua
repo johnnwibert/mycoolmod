@@ -193,6 +193,51 @@ SMODS.Joker {
     end
 }
 
+SMODS.Joker {
+    key = "piggy_bank",
+    rarity = 1,
+    atlas = 'mycoolmod',
+    pos = { x = 5, y = 0 },
+    blueprint_compat = false,
+    cost = 4,
+    discovered = true,
+    loc_txt = {
+        name = "Piggy Bank",
+        text = {
+            "Gains {C:money}$#1#{} of {C:attention}sell value{}",
+            "per reroll in the shop. {C:green}#2# in #3#{} chance",
+            "to break per reroll in the shop."
+        },
+    },
+    config = { extra = { price = 2, odds = 20 } },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra.price, (G.GAME.probabilities.normal or 1), card.ability.extra.odds } }
+    end,
+    calculate = function(self, card, context)
+        if context.reroll_shop and not context.blueprint then
+            if SMODS.pseudorandom_probability(card, 'piggy_bank', 1, card.ability.extra.odds) then
+                SMODS.destroy_cards(card, nil, nil, true)
+                return {
+                    message = "Whoops!",
+                    play_sound('glass2')
+                }
+            else
+                card.ability.extra_value = card.ability.extra_value + card.ability.extra.price
+                card:set_cost()
+                return {
+                    message = "Invested!"
+                }
+            end
+        end
+        if context.selling_self or context.getting_sliced then
+            return {
+                message = "Smashed!",
+                play_sound('glass2')
+            }
+        end
+    end
+}
+
 SMODS.Enhancement {
     key = "geel",
     config = {
