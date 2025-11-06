@@ -1,0 +1,11 @@
+{
+    "id": "jonklermod",
+    "name": "thejonklermod",
+    "display_name": "The Jonkler Mod",
+    "author": ["FlyingFish"],
+    "description": "Probably destroys the game and possibly the machine you're playing on.",
+    "prefix": "jonkler",
+    "main_file": "thejonklermod.lua",
+    "badge_colour": "652a8c",
+    "version": "1.0.0"
+}

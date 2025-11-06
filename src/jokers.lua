@@ -1,6 +1,6 @@
 SMODS.Atlas {
-    key = "mycoolmod",
-    path = "mycoolmod.png",
+    key = "thejonklermod",
+    path = "thejonklermod.png",
     px = 71,
     py = 95
 }
@@ -8,7 +8,7 @@ SMODS.Atlas {
 SMODS.Joker {
     key = "evil_ass_joker",
     rarity = 1,
-    atlas = 'mycoolmod',
+    atlas = 'thejonklermod',
     pos = { x = 0, y = 0 },
     blueprint_compat = true,
     cost = 1,
@@ -37,7 +37,7 @@ SMODS.Joker {
 SMODS.Joker {
     key = "illusion_joker",
     rarity = 2,
-    atlas = 'mycoolmod',
+    atlas = 'thejonklermod',
     pos = { x = 1, y = 0 },
     blueprint_compat = false,
     cost = 7,
@@ -83,7 +83,7 @@ SMODS.Joker {
 SMODS.Joker {
     key = "your_card",
     rarity = 1,
-    atlas = 'mycoolmod',
+    atlas = 'thejonklermod',
     pos = { x = 2, y = 0 },
     blueprint_compat = true,
     cost = 6,
@@ -123,7 +123,7 @@ SMODS.Joker {
 SMODS.Joker {
     key = "heroic_sacrifice",
     rarity = 2,
-    atlas = 'mycoolmod',
+    atlas = 'thejonklermod',
     pos = { x = 3, y = 0 },
     blueprint_compat = false,
     cost = 6,
@@ -167,11 +167,11 @@ SMODS.Joker {
 SMODS.Joker {
     key = "transmutation_joker",
     rarity = 3,
-    atlas = 'mycoolmod',
+    atlas = 'thejonklermod',
     pos = { x = 4, y = 0 },
     config = { max_highlighted = 1 },
     loc_vars = function(self, info_queue, card)
-        info_queue[#info_queue + 1] = G.P_CENTERS.m_coolmod_geel
+        info_queue[#info_queue + 1] = G.P_CENTERS.m_jonkler_geel
         return { vars = { card.ability.max_highlighted } }
     end,
     blueprint_compat = false,
@@ -190,7 +190,7 @@ SMODS.Joker {
             for _, scored_card in ipairs(context.scoring_hand) do
                 if SMODS.has_enhancement(scored_card, 'm_steel') or SMODS.has_enhancement(scored_card, 'm_gold') then
                     triggers = triggers + 1
-                    scored_card:set_ability('m_coolmod_geel', nil, true)
+                    scored_card:set_ability('m_jonkler_geel', nil, true)
                     G.E_MANAGER:add_event(Event({
                         func = function()
                             scored_card:juice_up()
@@ -211,7 +211,7 @@ SMODS.Joker {
 SMODS.Joker {
     key = "piggy_bank",
     rarity = 1,
-    atlas = 'mycoolmod',
+    atlas = 'thejonklermod',
     pos = { x = 5, y = 0 },
     blueprint_compat = false,
     cost = 4,

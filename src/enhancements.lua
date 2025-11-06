@@ -1,12 +1,13 @@
 SMODS.Atlas {
-    key = "mycoolmod_enhancement",
-    path = "mycoolmod_enhancement.png",
+    key = "jonkler_enhancement",
+    path = "jonkler_enhancement.png",
     px = 71,
     py = 95
 }
 
 SMODS.Enhancement {
     key = "geel",
+    atlas = "jonkler_enhancement",
     pos = { x = 0, y = 0 },
     config = {
         h_x_mult = 1.5,
