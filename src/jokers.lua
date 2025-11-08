@@ -18,7 +18,7 @@ SMODS.Joker {
         name = "Evil Ass Joker",
         text = {
             "Does some",
-            "{C:mult, s:1.2}Evil Ass{} shit",
+            "{C:mult,s:1.2}Evil Ass{} shit",
         },
     },
     loc_vars = function(self, info_queue, card)
@@ -248,6 +248,41 @@ SMODS.Joker {
             return {
                 message = "Smashed!",
                 play_sound('glass2')
+            }
+        end
+    end
+}
+
+SMODS.Joker {
+    key = "scrapbook",
+    rarity = 2,
+    atlas = "thejonklermod",
+    pos = { x = 0, y = 1 },
+    blueprint_compat = true,
+    cost = 7,
+    discovered = true,
+    loc_txt = {
+        name = "Scrapbook Joker",
+        text = {
+            "Gains {C:white,X:red}X#1#{} Mult{} per",
+            "{C:attention}Voucher{} redeemed in the shop",
+            "{C:inactive}(Currently {}{C:white,X:red}X#2# {C:inactive} Mult)"
+        },
+    },
+    config = { extra = { Xmult_mod = 1.0, Xmult = 1.0 } },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra.Xmult_mod, card.ability.extra.Xmult } }
+    end,
+    calculate = function(self, card, context)
+        if context.buying_card and context.card.ability.set == 'Voucher' and not context.blueprint then
+            card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_mod
+            return {
+                message = "Upgraded!"
+            }
+        end
+        if context.joker_main then
+            return {
+                Xmult = card.ability.extra.Xmult
             }
         end
     end
