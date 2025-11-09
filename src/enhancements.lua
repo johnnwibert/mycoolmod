@@ -19,7 +19,7 @@ SMODS.Enhancement {
     loc_txt = {
         name = "Geel Card",
         text = {
-            "{C:white,X:red}X#1#{} {C:red}Mult{} when held in hand",
+            "{C:white,X:red}X#1#{} Mult when held in hand",
             "{C:money}$#2#{} if this card is",
             "held in hand at",
             "end of round"

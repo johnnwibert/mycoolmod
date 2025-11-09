@@ -46,7 +46,7 @@ SMODS.Joker {
         name = "Master of Illusions",
         text = {
             "On {C:attention}first hand of round{}, turns a random",
-            "{C:attention}scoring card{} into a {C:green}lucky card{}, then",
+            "{C:attention}scoring card{} into a {C:attention}Lucky Card{}, then",
             "destroys a random card held in hand",
         },
     },
@@ -126,6 +126,7 @@ SMODS.Joker {
     atlas = 'thejonklermod',
     pos = { x = 3, y = 0 },
     blueprint_compat = false,
+    eternal_compat = false,
     cost = 6,
     discovered = true,
     loc_txt = {
@@ -140,7 +141,7 @@ SMODS.Joker {
         if context.selling_self then
             local valid_jokers = {}
             for k, v in pairs(G.jokers.cards) do
-                if v.ability.perishable or v.debuff then
+                if v ~= card and v.ability.perishable or v.debuff then
                     table.insert(valid_jokers, v)
                 end
             end
@@ -180,7 +181,7 @@ SMODS.Joker {
     loc_txt = {
         name = "Transmutation Joker",
         text = {
-            "Played {C:attention}Steel Cards{} or {C:attention}Gold Cards{}",
+            "Scored {C:attention}Steel Cards{} and {C:attention}Gold Cards{}",
             "become {C:attention}Geel Cards",
         },
     },
@@ -188,7 +189,7 @@ SMODS.Joker {
         if context.before and not context.blueprint then
             local triggers = 0
             for _, scored_card in ipairs(context.scoring_hand) do
-                if SMODS.has_enhancement(scored_card, 'm_steel') or SMODS.has_enhancement(scored_card, 'm_gold') then
+                if not scored_card.debuff and (SMODS.has_enhancement(scored_card, 'm_steel') or SMODS.has_enhancement(scored_card, 'm_gold')) then
                     triggers = triggers + 1
                     scored_card:set_ability('m_jonkler_geel', nil, true)
                     G.E_MANAGER:add_event(Event({
@@ -214,6 +215,7 @@ SMODS.Joker {
     atlas = 'thejonklermod',
     pos = { x = 5, y = 0 },
     blueprint_compat = false,
+    eternal_compat = false,
     cost = 4,
     discovered = true,
     loc_txt = {
@@ -259,12 +261,13 @@ SMODS.Joker {
     atlas = "thejonklermod",
     pos = { x = 0, y = 1 },
     blueprint_compat = true,
+    perishable_compat = false,
     cost = 7,
     discovered = true,
     loc_txt = {
         name = "Scrapbook Joker",
         text = {
-            "Gains {C:white,X:red}X#1#{} Mult{} per",
+            "Gains {C:white,X:red}X#1#{} Mult per",
             "{C:attention}Voucher{} redeemed in the shop",
             "{C:inactive}(Currently {}{C:white,X:red}X#2# {C:inactive} Mult)"
         },
@@ -278,6 +281,43 @@ SMODS.Joker {
             card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_mod
             return {
                 message = "Upgraded!"
+            }
+        end
+        if context.joker_main then
+            return {
+                Xmult = card.ability.extra.Xmult
+            }
+        end
+    end
+}
+
+SMODS.Joker {
+    key = "herecomes",
+    rarity = 1,
+    atlas = "thejonklermod",
+    pos = { x = 1, y = 1 },
+    blueprint_compat = true,
+    perishable_compat = false,
+    cost = 6,
+    discovered = true,
+    loc_txt = {
+        name = "Here Comes...",
+        text = {
+            "Gains {C:white,X:red}X#1#{} Mult per",
+            "{C:attention}Sun Tarot{} used",
+            "{C:inactive}(Currently {}{C:white,X:red}X#2# {C:inactive} Mult)"
+        },
+    },
+    config = { extra = { Xmult_mod = 0.25, Xmult = 1.0, max_highlighted = 1 } },
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue + 1] = G.P_CENTERS.c_sun
+        return { vars = { card.ability.extra.Xmult_mod, card.ability.extra.Xmult, card.ability.max_highlighted } }
+    end,
+    calculate = function(self, card, context)
+        if context.using_consumeable and not context.blueprint and context.consumeable.config.center.key == "c_sun" then
+            card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_mod
+            return {
+                message = "Doo-doo-doo-doo!"
             }
         end
         if context.joker_main then
