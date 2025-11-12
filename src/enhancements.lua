@@ -9,6 +9,9 @@ SMODS.Enhancement {
     key = "geel",
     atlas = "jonkler_enhancement",
     pos = { x = 0, y = 0 },
+    in_pool = function(self, args)
+        return false
+    end,
     config = {
         h_x_mult = 1.5,
         h_dollars = 3,
@@ -26,5 +29,3 @@ SMODS.Enhancement {
         },
     },
 }
-
---you can just use the enhancement key instead of e_polychrome there if you made a new enhancement 

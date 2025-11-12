@@ -272,7 +272,7 @@ SMODS.Joker {
             "{C:inactive}(Currently {}{C:white,X:red}X#2# {C:inactive} Mult)"
         },
     },
-    config = { extra = { Xmult_mod = 1.0, Xmult = 1.0 } },
+    config = { extra = { Xmult_mod = 0.75, Xmult = 1.0 } },
     loc_vars = function(self, info_queue, card)
         return { vars = { card.ability.extra.Xmult_mod, card.ability.extra.Xmult } }
     end,
@@ -292,7 +292,7 @@ SMODS.Joker {
 }
 
 SMODS.Joker {
-    key = "herecomes",
+    key = "here_comes",
     rarity = 1,
     atlas = "thejonklermod",
     pos = { x = 1, y = 1 },
@@ -328,6 +328,59 @@ SMODS.Joker {
     end
 }
 
+SMODS.Joker {
+    key = "trash_joker",
+    rarity = 2,
+    atlas = "thejonklermod",
+    pos = { x = 2, y = 1 },
+    blueprint_compat = true,
+    cost = 7,
+    discovered = true,
+    loc_txt = {
+        name = "One Man's Trash",
+        text = {
+            "Gives a {C:spectral}Spectral{} card if",
+            "{C:attention}final discard{} of round contains",
+            "{C:attention} #2#{} {V:1}#1#{} cards"
+        },
+    },
+    config = { extra = { discards = 5 } },
+    loc_vars = function(self, info_queue, card)
+        local suit = G.GAME.current_round.trash_suit or 'Spades'
+        return { vars = { localize(suit, 'suits_singular'), colours = { G.C.SUITS[suit] }, card.ability.extra.discards } }
+    end,
+    calculate = function(self, card, context)
+        if G.GAME.current_round.discards_left == 1 then
+            local eval = function() return G.GAME.current_round.discards_left > 0 and not G.RESET_JIGGLES end
+            juice_card_until(card, eval, true)
+        end
+        if context.pre_discard and #context.full_hand == 5 and G.GAME.current_round.discards_left == 1 then
+            local suit_cards = 0
+            for _, discarded_card in ipairs(context.full_hand) do
+                if discarded_card:is_suit(G.GAME.current_round.trash_suit) then suit_cards = suit_cards + 1 end
+            end
+            if suit_cards >= card.ability.extra.discards then
+                if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+                    G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+                    G.E_MANAGER:add_event(Event({
+                        func = (function()
+                            SMODS.add_card {
+                                set = 'Spectral'
+                            }
+                            G.GAME.consumeable_buffer = 0
+                            return true
+                    end)
+                }))
+                return {
+                    message = "Treasure!",
+                    colour = G.C.SECONDARY_SET.Spectral
+                }
+            end
+        end
+    end
+end
+}
+
 local function reset_money_card()
     G.GAME.current_round.money_card = { rank = 'Ace', suit = 'Spades' }
     local valid_money_cards = {}
@@ -344,6 +397,17 @@ local function reset_money_card()
     end
 end
 
+local function reset_trash_suit()
+    G.GAME.current_round.trash_suit = G.GAME.current_round.trash_suit or 'Spades'
+    local suits = {}
+    for k, v in ipairs({ 'Spades', 'Hearts', 'Clubs', 'Diamonds' }) do
+        if v ~= G.GAME.current_round.trash_suit then suits[#suits+1] = v end
+    end
+    local trash_suit = pseudorandom_element(suits, 'trash' .. G.GAME.round_resets.ante)
+    G.GAME.current_round.trash_suit = trash_suit
+end
+
 function SMODS.current_mod.reset_game_globals(run_start)
     reset_money_card()
+    reset_trash_suit()
 end
