@@ -341,18 +341,23 @@ SMODS.Joker {
         text = {
             "Gives a {C:spectral}Spectral{} card if",
             "{C:attention}final discard{} of round contains",
-            "{C:attention} #2#{} {V:1}#1#{} cards"
+            "{C:attention} #2#{} {V:1}#1#{} cards",
+            "{s:0.8}Suit changes every round{}"
         },
     },
-    config = { extra = { discards = 5 } },
+    config = { extra = { discards = 5, juice_check = false } },
     loc_vars = function(self, info_queue, card)
         local suit = G.GAME.current_round.trash_suit or 'Spades'
-        return { vars = { localize(suit, 'suits_singular'), colours = { G.C.SUITS[suit] }, card.ability.extra.discards } }
+        return { vars = { localize(suit, 'suits_singular'), colours = { G.C.SUITS[suit] }, card.ability.extra.discards, card.ability.extra.juice_check } }
     end,
     calculate = function(self, card, context)
-        if G.GAME.current_round.discards_left == 1 then
+        if context.first_hand_drawn then
+            card.ability.extra.juice_check = true
+        end
+        if G.GAME.blind.in_blind and G.GAME.current_round.discards_left == 1 and card.ability.extra.juice_check == true then
             local eval = function() return G.GAME.current_round.discards_left > 0 and not G.RESET_JIGGLES end
             juice_card_until(card, eval, true)
+            card.ability.extra.juice_check = false
         end
         if context.pre_discard and #context.full_hand == 5 and G.GAME.current_round.discards_left == 1 then
             local suit_cards = 0
@@ -372,13 +377,51 @@ SMODS.Joker {
                     end)
                 }))
                 return {
-                    message = "Treasure!",
-                    colour = G.C.SECONDARY_SET.Spectral
+                    message = "Treasure!"
                 }
             end
         end
     end
 end
+}
+
+SMODS.Joker {
+    key = "blind_box",
+    rarity = 1,
+    atlas = "thejonklermod",
+    pos = { x = 3, y = 1 },
+    blueprint_compat = true,
+    cost = 6,
+    discovered = true,
+    loc_txt = {
+        name = "Blind Box",
+        text = {
+            "Gives a random {C:attention}Tag{}",
+            "after beating a {C:attention}Boss Blind{}"
+        },
+    },
+    calculate = function(self, card, context)
+        if context.ante_change and context.ante_end then
+            G.E_MANAGER:add_event(Event({
+                func = (function()
+                local tag_pool = get_current_pool('Tag')
+                local selected_tag = pseudorandom_element(tag_pool, 'jonkler_seed')
+                local it = 1
+                while selected_tag == 'UNAVAILABLE' or selected_tag == 'tag_orbital' do
+                    it = it + 1
+                    selected_tag = pseudorandom_element(tag_pool, 'jonkler_seed_resample'..it)
+                end
+                add_tag(Tag(selected_tag, false, 'Small'))
+                play_sound('generic1', 0.9 + math.random() * 0.1, 0.8)
+                play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+                return true
+                end)
+            }))
+            return {
+                message = "Unboxing!"
+            }
+        end
+    end
 }
 
 local function reset_money_card()
